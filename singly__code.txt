@@ -1,0 +1,150 @@
+#include<iostream>
+
+using namespace std;
+
+class node {
+	int data;
+	node* next_node;
+public:
+	node(int d = 0, node* nx = nullptr) {
+		data = d;
+		next_node = nx;
+	}
+	node* next() const {
+		return next_node;
+	}
+	int retrieve() {
+		return data;
+	}
+	void setnext(node* nn) {
+		next_node = nn;
+	}
+};
+
+class list {
+	node* head;
+public:
+	list()
+	{
+		head = nullptr;
+	}
+	bool empty() {
+		return (head == nullptr);
+	}
+	void push_front(int a) {
+		if (empty()) {
+			head = new node(a, nullptr);
+		}
+		else {
+			head = new node(a, head);
+
+		}
+	}
+
+	void pop_front() {
+		if (empty()) {
+			throw "underflow";
+		}
+		node* temp = head;
+		head = head->next();
+
+		delete temp;
+		temp = nullptr;
+	}
+	void display() {
+
+		for (node* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+			cout << ptr->retrieve() << "\t";
+		}
+		cout << "\n";
+	}
+	void pop_back() {
+
+		node* temp = head;
+
+		for (node* ptr = head; ptr->next() != nullptr; ptr = ptr->next()) {
+			temp = ptr;
+		}
+
+		node* del = temp->next();
+
+		temp->setnext(nullptr);
+		delete del;
+		del = nullptr;
+
+
+	}
+	void push_back(int c) {
+		node* temp = head;
+
+		for (node* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+			temp = ptr;
+
+		}
+		node* a = new node(c, nullptr);
+		temp->setnext(a);
+	}
+
+	int count(int a) {
+
+		int count = 0;
+		for (node* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+			
+			if (ptr->retrieve() == a) {
+				count += 1;
+			}
+		}
+		return count;
+	}
+
+	void erase_in_between(int n) {
+		if (empty()) {
+			cout << "List is empty.\n";
+			return;
+		}
+		if (head->retrieve() == n) {
+			pop_front();
+			return;
+		}
+		node* prev = nullptr;
+		node* ptr = head;
+		for (ptr = head; ptr!= nullptr; ptr= ptr->next()) {
+			if (ptr->retrieve() == n) {
+				break;
+			}
+			prev = ptr;
+		}
+
+		if (ptr == nullptr) {
+			cout << "Element not found.\n";
+			return;
+		}
+
+		prev->setnext(ptr->next());
+		delete ptr;
+		ptr= nullptr;
+	}
+	
+};
+int main() {
+	list s1;
+	s1.push_front(5);
+	s1.push_front(4);
+	s1.push_front(3);
+	s1.push_front(2);
+	s1.push_front(1);
+	s1.push_front(0);
+	s1.display();
+	//s1.pop_front();
+	//s1.pop_back();
+	//s1.push_back(6);
+	//s1.display();
+	//cout<<s1.count(1)<<endl;
+	s1.erase_in_between(0);
+	s1.display();
+	s1.erase_in_between(1);
+	s1.display();
+	s1.erase_in_between(4);
+	s1.display();
+
+}

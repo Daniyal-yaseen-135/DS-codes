@@ -321,7 +321,7 @@ int main() {
 
     Tree* root = new Tree(4, nullptr);
     if ((root->is_root())) {
-        cout << "sufyan bhrwa";
+        cout << "yeeeee";
     }
     root->insertchildren(5);
     cout << "\nsss: " << root->height();

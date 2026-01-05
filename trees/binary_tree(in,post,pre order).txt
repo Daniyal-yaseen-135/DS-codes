@@ -1,0 +1,430 @@
+#include<iostream>
+using namespace std;
+
+template <typename T>
+class node {
+    T data;
+    node<T>* next_node;
+public:
+    node(T d = T(), node<T>* nx = nullptr) {
+        data = d;
+        next_node = nx;
+    }
+    node<T>* next() const {
+        return next_node;
+    }
+    T retrieve() {
+        return data;
+    }
+    void setnext(node<T>* nn) {
+        next_node = nn;
+    }
+};
+
+template <typename T>
+class list {
+    node<T>* head;
+public:
+    list() {
+        head = nullptr;
+    }
+
+    node<T>* get_head() const {
+        return head;
+    }
+
+    bool empty() {
+        return (head == nullptr);
+    }
+
+    void push_front(T a) {
+        if (empty()) {
+            head = new node<T>(a, nullptr);
+        }
+        else {
+            head = new node<T>(a, head);
+        }
+    }
+
+    void pop_front() {
+        if (empty()) {
+            throw "underflow";
+        }
+        node<T>* temp = head;
+        head = head->next();
+        delete temp;
+    }
+
+    void display() {
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            cout << ptr->retrieve() << "\t";
+        }
+        cout << "\n";
+    }
+
+    void pop_back() {
+
+        if (empty()) {
+            throw "underflow";
+        }
+
+        if (head->next() == nullptr) {
+            delete head;
+            head = nullptr;
+            return;
+        }
+
+        node<T>* temp = head;
+
+        for (node<T>* ptr = head; ptr->next() != nullptr; ptr = ptr->next()) {
+            temp = ptr;
+        }
+
+        node<T>* del = temp->next();
+        temp->setnext(nullptr);
+        delete del;
+    }
+
+    void push_back(T c) {
+        if (empty()) {
+            head = new node<T>(c, nullptr);
+            return;
+        }
+
+        node<T>* temp = head;
+
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            temp = ptr;
+        }
+
+        node<T>* a = new node<T>(c, nullptr);
+        temp->setnext(a);
+    }
+
+    int count(T a) {
+        int count = 0;
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            if (ptr->retrieve() == a) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    void erase_in_between(T n) {
+        if (empty()) {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        if (head->retrieve() == n) {
+            pop_front();
+            return;
+        }
+
+        node<T>* prev = nullptr;
+        node<T>* ptr = head;
+
+        for (ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            if (ptr->retrieve() == n) {
+                break;
+            }
+            prev = ptr;
+        }
+
+        if (ptr == nullptr) {
+            cout << "Element not found.\n";
+            return;
+        }
+
+        prev->setnext(ptr->next());
+        delete ptr;
+    }
+
+    T front() {
+        if (empty()) {
+            throw "underflow";
+        }
+        return head->retrieve();
+    }
+    int count_nodes() {
+        int c = 0;
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            c++;
+        }
+        return c;
+    }
+};
+
+template <typename T>
+class Queue {
+private:
+    list<T> L;
+
+public:
+    bool empty() {
+        return L.empty();
+    }
+
+    void enqueue(T x) {
+        L.push_back(x);
+    }
+
+    void dequeue() {
+        if (L.empty()) {
+            throw "Underflow";
+        }
+        L.pop_front();
+    }
+
+    T front() {
+        if (L.empty()) {
+            throw "Underflow";
+        }
+        return L.front();
+    }
+
+    void display() {
+        cout << "Queue (front → rear): ";
+        L.display();
+    }
+};
+
+
+
+
+
+class Binary_node
+{
+private :
+    int element;
+    Binary_node* left_tree;
+    Binary_node* right_tree;
+
+public:
+    // Constructor
+    Binary_node(int const& x)
+    {
+        element = x;
+        left_tree = nullptr;
+        right_tree = nullptr;
+    }
+
+    void set_left(Binary_node * l)
+    {
+        left_tree = l;
+    }
+
+    void set_right(Binary_node* l)
+    {
+        right_tree = l;
+    }
+
+    // Return stored value
+     int retrieve() const
+    {
+        return element;
+    }
+
+    // Return left child
+    Binary_node* left() const
+    {
+        return left_tree;
+    }
+
+    // Return right child
+    Binary_node* right() const
+    {
+        return right_tree;
+    }
+
+    // Check if node is empty
+    bool empty() const
+    {
+        return this == nullptr;
+    }
+
+    // Check if leaf node
+    bool is_leaf() const
+    {
+        return (left_tree == nullptr && right_tree == nullptr);
+    }
+
+    // Total number of nodes in tree
+    int size() const
+    {
+        int total = 1;
+
+        if (left_tree != nullptr)
+            total += left_tree->size();
+
+        if (right_tree != nullptr)
+            total += right_tree->size();
+
+        return total;
+    }
+
+    // Height of tree
+    int height() const
+    {
+        int lh = 0, rh = 0;
+
+        if (left_tree != nullptr)
+            lh = 1 + left_tree->height();
+
+        if (right_tree != nullptr)
+            rh = 1 + right_tree->height();
+
+        return max(lh, rh);
+    }
+
+    // Clear (delete) subtree
+    void clear(Binary_node* t)
+    {
+        if (t == nullptr)
+            return;
+
+        clear(t->left_tree);
+        clear(t->right_tree);
+        delete t;
+    }
+};
+class Binary_tree
+{
+private:
+    Binary_node* root;
+
+public:
+    Binary_tree()
+    {
+        root = nullptr;
+    }
+
+    bool empty() const
+    {
+        return root == nullptr;
+    }
+
+    Binary_node* get_root() const
+    {
+        return root;
+    }
+
+    // Insert (simple binary tree insertion, NOT BST)
+    void insert(int obj)
+    {
+        Binary_node* n = new Binary_node(obj);
+        if (root->empty())
+        {
+            root = n;
+        }
+        else if (root->left() == NULL)
+        {
+            root->set_left(n);
+        }
+        else if (root->right() == NULL)
+        {
+            root->set_right(n);
+        }
+        else
+        {
+            Binary_node* r = root;
+            // Decide whether to insert on the left or right subtree
+            if (r->left()->height() > r->right()->height())
+            {
+                // Left is taller, so traverse down the right-most path on the right side
+                while (r->right() != NULL)
+                {
+                    r = r->right();
+                }
+                r->set_right(n);
+            }
+            else
+            {
+                // Right is taller or equal, so traverse down the left-most path on the left side
+                while (r->left() != NULL)
+                {
+                    r = r->left();
+                }
+                r->set_left(n);
+            }
+        }
+    }
+
+    // Inorder Traversal
+    void inorder(Binary_node* t) const
+    {
+        if (t == nullptr) return;
+
+        inorder(t->left());
+        cout << t->retrieve() << " ";
+        inorder(t->right());
+    }
+
+    // Preorder Traversal
+    void preorder(Binary_node* t) const
+    {
+        if (t == nullptr) return;
+
+        cout << t->retrieve() << " ";
+        preorder(t->left());
+        preorder(t->right());
+    }
+
+    // Postorder Traversal
+    void postorder(Binary_node* t) const
+    {
+        if (t == nullptr) return;
+
+        postorder(t->left());
+        postorder(t->right());
+        cout << t->retrieve() << " ";
+    }
+
+    int size() const
+    {
+        if (root == nullptr) return 0;
+        return root->size();
+    }
+
+    int height() const
+    {
+        if (root == nullptr) return -1;
+        return root->height();
+    }
+
+    void clear()
+    {
+        if (root != nullptr)
+        {
+            root->clear(root);
+            root = nullptr;
+        }
+    }
+};
+int main()
+{
+    Binary_tree bt;
+
+    bt.insert(1);
+    bt.insert(2);
+    bt.insert(3);
+    bt.insert(4);
+    bt.insert(5);
+
+
+
+    cout << "Inorder: ";
+    bt.inorder(bt.get_root());
+
+    cout << "\nPreorder: ";
+    bt.preorder(bt.get_root());
+
+    cout << "\nPostorder: ";
+    bt.postorder(bt.get_root());
+
+    cout << "\nSize: " << bt.size();
+    cout << "\nHeight: " << bt.height();
+
+    bt.clear();
+}

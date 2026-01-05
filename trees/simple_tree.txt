@@ -1,0 +1,348 @@
+#include<iostream>
+using namespace std;
+
+template <typename T>
+class node {
+    T data;
+    node<T>* next_node;
+public:
+    node(T d = T(), node<T>* nx = nullptr) {
+        data = d;
+        next_node = nx;
+    }
+    node<T>* next() const {
+        return next_node;
+    }
+    T retrieve() {
+        return data;
+    }
+    void setnext(node<T>* nn) {
+        next_node = nn;
+    }
+};
+
+template <typename T>
+class list {
+    node<T>* head;
+public:
+    list() {
+        head = nullptr;
+    }
+
+    node<T>* get_head() const {
+        return head;
+    }
+
+    bool empty() {
+        return (head == nullptr);
+    }
+
+    void push_front(T a) {
+        if (empty()) {
+            head = new node<T>(a, nullptr);
+        }
+        else {
+            head = new node<T>(a, head);
+        }
+    }
+
+    void pop_front() {
+        if (empty()) {
+            throw "underflow";
+        }
+        node<T>* temp = head;
+        head = head->next();
+        delete temp;
+    }
+
+    void display() {
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            cout << ptr->retrieve() << "\t";
+        }
+        cout << "\n";
+    }
+
+    void pop_back() {
+
+        if (empty()) {
+            throw "underflow";
+        }
+
+        if (head->next() == nullptr) {
+            delete head;
+            head = nullptr;
+            return;
+        }
+
+        node<T>* temp = head;
+
+        for (node<T>* ptr = head; ptr->next() != nullptr; ptr = ptr->next()) {
+            temp = ptr;
+        }
+
+        node<T>* del = temp->next();
+        temp->setnext(nullptr);
+        delete del;
+    }
+
+    void push_back(T c) {
+        if (empty()) {
+            head = new node<T>(c, nullptr);
+            return;
+        }
+
+        node<T>* temp = head;
+
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            temp = ptr;
+        }
+
+        node<T>* a = new node<T>(c, nullptr);
+        temp->setnext(a);
+    }
+
+    int count(T a) {
+        int count = 0;
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            if (ptr->retrieve() == a) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    void erase_in_between(T n) {
+        if (empty()) {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        if (head->retrieve() == n) {
+            pop_front();
+            return;
+        }
+
+        node<T>* prev = nullptr;
+        node<T>* ptr = head;
+
+        for (ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            if (ptr->retrieve() == n) {
+                break;
+            }
+            prev = ptr;
+        }
+
+        if (ptr == nullptr) {
+            cout << "Element not found.\n";
+            return;
+        }
+
+        prev->setnext(ptr->next());
+        delete ptr;
+    }
+
+    T front() {
+        if (empty()) {
+            throw "underflow";
+        }
+        return head->retrieve();
+    }
+    int count_nodes() {
+        int c = 0;
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            c++;
+        }
+        return c;
+    }
+};
+
+template <typename T>
+class Queue {
+private:
+    list<T> L;
+
+public:
+    bool empty() {
+        return L.empty();
+    }
+
+    void enqueue(T x) {
+        L.push_back(x);
+    }
+
+    void dequeue() {
+        if (L.empty()) {
+            throw "Underflow";
+        }
+        L.pop_front();
+    }
+
+    T front() {
+        if (L.empty()) {
+            throw "Underflow";
+        }
+        return L.front();
+    }
+
+    void display() {
+        cout << "Queue (front → rear): ";
+        L.display();
+    }
+};
+
+
+
+class Tree {
+private:
+    int data;
+    Tree* parentnode;
+    list<Tree*> children;
+public:
+
+    Tree(int a = 0, Tree* p = nullptr) {
+        data = a;
+        parentnode = p;
+    }
+    void insertvalue(int v) {
+        data = v;
+    }
+    int retrieve() {
+        return data;
+    }
+    Tree* parent() {
+        return parentnode;
+    }
+    bool is_root() {
+        return(parentnode == nullptr);
+    }
+    int degree() {
+        int a = children.count_nodes();
+        return a;
+    }
+
+    bool is_leaf() {
+        return(degree() == 0);
+
+    }
+    void insertchildren(int val) {
+        Tree* t = new Tree(val, this);
+        children.push_back(t);
+    }
+    Tree* child(int n) {
+        int index = 1;
+        for (node<Tree*>* ptr = children.get_head();ptr != nullptr;ptr = ptr->next()) {
+            if (index == n) {
+                return ptr->retrieve();
+            }
+            index++;
+        }
+    }
+    int height() {
+        if (is_leaf()) return 0;
+
+        int h = 0;
+
+        for (node<Tree*>* ptr = children.get_head();ptr != nullptr; ptr = ptr->next())
+        {
+            int childH = ptr->retrieve()->height();
+            h = max(h, 1 + childH);
+        }
+
+        return h;
+    }
+    int size() {
+        int total = 1;
+
+        for (node<Tree*>* ptr = children.get_head();
+            ptr != nullptr;
+            ptr = ptr->next())
+        {
+            total += ptr->retrieve()->size();
+        }
+        return total;
+    }
+
+
+    void attach(Tree* subt) {
+
+        if (subt->parentnode != nullptr) {
+            subt->detach();
+        }
+
+        subt->parentnode = this;
+        children.push_back(subt);
+    }
+    void detach() {
+        if (parentnode == nullptr) return;
+
+        list<Tree*>& siblings = parentnode->children;
+
+        siblings.erase_in_between(this);
+
+        parentnode = nullptr;
+    }
+
+    void breadth_first_traversal()
+    {
+        Queue<Tree*> q;
+        q.enqueue(this);
+
+        while (!q.empty())
+        {
+            Tree* p = q.front();  // get front element
+            q.dequeue();
+            cout << p->retrieve() << "\t";
+
+
+            for (node<Tree*>* ptr = p->children.get_head();ptr != NULL; ptr = ptr->next())
+            {
+                q.enqueue(ptr->retrieve());
+            }
+        }
+    }
+    void depth_first_traversal()
+    {
+        // Visit the current node first
+        cout << this->retrieve() << "\t";
+
+        // Traverse all children recursively
+        for (node<Tree*>* ptr = children.get_head();ptr != NULL; ptr = ptr->next())
+        {
+            ptr->retrieve()->depth_first_traversal();
+        }
+    }
+
+
+
+
+};
+
+int main() {
+
+    Tree* root = new Tree(4, nullptr);
+    if ((root->is_root())) {
+        cout << "sufyan bhrwa";
+    }
+    root->insertchildren(5);
+    cout << "\nsss: " << root->height();
+    Tree* test = new Tree(6, nullptr);
+    Tree* t = new Tree(7, nullptr);
+    test->attach(t);
+
+    cout << "\n\nattach succes:  " << test->child(1)->retrieve();
+
+    t->detach();
+
+    root->attach(t);
+    root->attach(test);
+
+    for (int a = 1;a < 4;a++) {
+
+        cout << "\n" << root->child(a)->retrieve();
+    }
+    t->insertchildren(8);
+    cout << endl << endl;
+    root->depth_first_traversal();
+    return 0;
+}
+

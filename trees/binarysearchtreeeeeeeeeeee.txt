@@ -1,0 +1,494 @@
+#include<iostream>
+#include<algorithm>
+using namespace std;
+
+template <typename T>
+class node {
+    T data;
+    node<T>* next_node;
+public:
+    node(T d = T(), node<T>* nx = nullptr) {
+        data = d;
+        next_node = nx;
+    }
+    node<T>* next() const {
+        return next_node;
+    }
+    T retrieve() {
+        return data;
+    }
+    void setnext(node<T>* nn) {
+        next_node = nn;
+    }
+};
+
+template <typename T>
+class list {
+    node<T>* head;
+public:
+    list() {
+        head = nullptr;
+    }
+
+    node<T>* get_head() const {
+        return head;
+    }
+
+    bool empty() {
+        return (head == nullptr);
+    }
+
+    void push_front(T a) {
+        if (empty()) {
+            head = new node<T>(a, nullptr);
+        }
+        else {
+            head = new node<T>(a, head);
+        }
+    }
+
+    void pop_front() {
+        if (empty()) {
+            throw "underflow";
+        }
+        node<T>* temp = head;
+        head = head->next();
+        delete temp;
+    }
+
+    void display() {
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            cout << ptr->retrieve() << "\t";
+        }
+        cout << "\n";
+    }
+
+    void pop_back() {
+
+        if (empty()) {
+            throw "underflow";
+        }
+
+        if (head->next() == nullptr) {
+            delete head;
+            head = nullptr;
+            return;
+        }
+
+        node<T>* temp = head;
+
+        for (node<T>* ptr = head; ptr->next() != nullptr; ptr = ptr->next()) {
+            temp = ptr;
+        }
+
+        node<T>* del = temp->next();
+        temp->setnext(nullptr);
+        delete del;
+    }
+
+    void push_back(T c) {
+        if (empty()) {
+            head = new node<T>(c, nullptr);
+            return;
+        }
+
+        node<T>* temp = head;
+
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            temp = ptr;
+        }
+
+        node<T>* a = new node<T>(c, nullptr);
+        temp->setnext(a);
+    }
+
+    int count(T a) {
+        int count = 0;
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            if (ptr->retrieve() == a) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    void erase_in_between(T n) {
+        if (empty()) {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        if (head->retrieve() == n) {
+            pop_front();
+            return;
+        }
+
+        node<T>* prev = nullptr;
+        node<T>* ptr = head;
+
+        for (ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            if (ptr->retrieve() == n) {
+                break;
+            }
+            prev = ptr;
+        }
+
+        if (ptr == nullptr) {
+            cout << "Element not found.\n";
+            return;
+        }
+
+        prev->setnext(ptr->next());
+        delete ptr;
+    }
+
+    T front() {
+        if (empty()) {
+            throw "underflow";
+        }
+        return head->retrieve();
+    }
+    int count_nodes() {
+        int c = 0;
+        for (node<T>* ptr = head; ptr != nullptr; ptr = ptr->next()) {
+            c++;
+        }
+        return c;
+    }
+};
+
+template <typename T>
+class Queue {
+private:
+    list<T> L;
+
+public:
+    bool empty() {
+        return L.empty();
+    }
+
+    void enqueue(T x) {
+        L.push_back(x);
+    }
+
+    void dequeue() {
+        if (L.empty()) {
+            throw "Underflow";
+        }
+        L.pop_front();
+    }
+
+    T front() {
+        if (L.empty()) {
+            throw "Underflow";
+        }
+        return L.front();
+    }
+
+    void display() {
+        cout << "Queue (front → rear): ";
+        L.display();
+    }
+};
+
+
+
+
+
+class BinarySearchNode {
+private:
+    int element;
+    BinarySearchNode* left_tree;
+    BinarySearchNode* right_tree;
+
+public:
+    // Constructor
+    BinarySearchNode(int obj) {
+        element = obj;
+        left_tree = nullptr;
+        right_tree = nullptr;
+
+
+    }
+    int retrieve() const {
+        return element;
+    }
+
+    BinarySearchNode* left() const {
+        return left_tree;
+    }
+
+    BinarySearchNode* right() const {
+        return right_tree;
+    }
+
+
+    void setdata(int obj) {
+        element = obj;
+    }
+
+    void setleft(BinarySearchNode* obj) {
+        left_tree = obj;
+    }
+
+    void setright(BinarySearchNode* obj) {
+        right_tree = obj;
+    }
+
+    bool empty() const {
+        return this == nullptr;
+    }
+
+    bool is_leaf() const {
+        return left_tree == nullptr && right_tree == nullptr;
+    }
+    int size() const {
+
+        int total = 1;
+
+        if (left_tree != nullptr)
+            total += left_tree->size();
+
+        if (right_tree != nullptr)
+            total += right_tree->size();
+
+        return total;
+
+    }
+    int height() const {
+        int lh = 0, rh = 0;
+
+        if (left_tree != nullptr)
+            lh = 1 + left_tree->height();
+
+        if (right_tree != nullptr)
+            rh = 1 + right_tree->height();
+
+        return max(lh, rh);
+
+    }
+
+    void clear(BinarySearchNode*& ptr_to_this) {
+        if (ptr_to_this == nullptr)
+            return;
+
+        if (left_tree)
+            left_tree->clear(left_tree);
+        if (right_tree)
+            right_tree->clear(right_tree);
+
+        delete ptr_to_this;
+        ptr_to_this = nullptr;
+    }
+
+    int front() const {
+        if (left_tree == nullptr)
+            return element;
+        return left_tree->front();
+    }
+
+    int back() const {
+        if (right_tree == nullptr)
+            return element;
+        return right_tree->back();
+    }
+    bool insert(int obj, BinarySearchNode*& ptr_to_this) {
+        if (ptr_to_this == nullptr) {
+            ptr_to_this = new BinarySearchNode(obj);
+            return true;
+        }
+        if (obj < element)
+            return left_tree->insert(obj, left_tree);
+        else if (obj > element)
+            return right_tree->insert(obj, right_tree);
+        else
+            return false; // duplicate not allowed
+    }
+    bool erase(int obj, BinarySearchNode*& ptr_to_this) {
+        if (ptr_to_this == nullptr)
+            return false;
+
+        if (obj < element)
+            return left_tree->erase(obj, left_tree);
+        else if (obj > element)
+            return right_tree->erase(obj, right_tree);
+        else {
+            // node found
+            if (left_tree == nullptr && right_tree == nullptr) {
+                delete ptr_to_this;
+                ptr_to_this = nullptr;
+                ;
+            }
+            else if (left_tree && right_tree) {
+                element = right_tree->front();
+                right_tree->erase(element, right_tree);
+            }
+            else {
+                BinarySearchNode* child =
+                    (left_tree != nullptr) ? left_tree : right_tree;
+                delete this;
+                ptr_to_this = child;
+            }
+            return true;
+        }
+    }
+    bool search(int obj, BinarySearchNode* ptr_to_this) {
+        if (ptr_to_this == nullptr)
+            return false;
+
+        if (obj < element)
+            return left_tree->search(obj, left_tree);
+        else if (obj > element)
+            return right_tree->search(obj, right_tree);
+        else
+            return true;   // object found
+    }
+
+};
+
+        class Binary_search_tree {
+        private:
+            BinarySearchNode* root_node;
+
+        public:
+            // Constructor
+            Binary_search_tree() {
+                root_node = nullptr;
+            }
+
+            // Destructor
+            ~Binary_search_tree() {
+                clear();
+            }
+
+            // Return root
+            BinarySearchNode* root() const {
+                return root_node;
+            }
+
+            // Check if tree is empty
+            bool empty() const {
+                return root_node == nullptr;
+            }
+
+            // Number of nodes
+            int size() const {
+                return (root_node == nullptr) ? 0 : root_node->size();
+            }
+
+            // Height of tree
+            int height() const {
+                return (root_node == nullptr) ? -1 : root_node->height();
+            }
+
+            // Minimum value
+            int front() const {
+                if (empty()) {
+                    throw "Underflow";
+                }
+                return root_node->front();
+            }
+
+            // Maximum value
+            int back() const {
+                if (empty()) {
+                    throw "Underflow";
+                }
+                return root_node->back();
+            }
+
+            // Insert value
+            bool insert(int obj) {
+                if (root_node == nullptr) {
+                    root_node = new BinarySearchNode(obj);
+                    return true;
+                }
+                return root_node->insert(obj, root_node);
+            }
+
+            // Erase value
+            bool erase(int obj) {
+                if (root_node == nullptr) {
+                    return false;
+                }
+                return root_node->erase(obj, root_node);
+            }
+
+            // Clear tree
+            void clear() {
+                if (root_node != nullptr) {
+                    root_node->clear(root_node);
+                    root_node = nullptr;
+                }
+            }
+
+            // Search helper (optional)
+            bool search(int obj) {
+                if (root_node == nullptr) {
+                    return false;
+                }
+                return root_node->search(obj,root_node);
+            }
+
+            void inorder(BinarySearchNode* node) {
+                if (node == nullptr)
+                    return;
+
+                inorder(node->left());
+                cout << node->retrieve() << " ";
+                inorder(node->right());
+            }
+            void preorder(BinarySearchNode* node) {
+                if (node == nullptr)
+                    return;
+
+                cout << node->retrieve() << " ";
+                preorder(node->left());
+                preorder(node->right());
+            }
+            void postorder(BinarySearchNode* node) {
+                if (node == nullptr)
+                    return;
+
+                postorder(node->left());
+                postorder(node->right());
+                cout << node->retrieve() << " ";
+            }
+
+
+        };
+       
+
+
+
+int main()
+{
+    Binary_search_tree bst;
+
+
+    // Creating BST
+    bst.insert(50);
+    bst.insert(30);
+    bst.insert(70);
+    bst.insert(20);
+    bst.insert(40);
+    bst.insert(60);
+    bst.insert(80);
+
+    cout<<bst.front();
+    cout<<bst.back();
+    cout << "Inorder Traversal: ";
+    /*bst.inorder(bst.root()); // Sorted order
+
+
+    cout << "Preorder Traversal: ";
+    bst.preorder(bst.root());
+
+
+    cout << "Postorder Traversal: ";
+    bst.postorder(bst.root());
+    */
+
+    return 0;
+
+}
